@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Bingo  🎱</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(120deg, #0f0f0f, #000000);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 30px 20px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 3.5em;
+      color: #00f0ff;
+      text-shadow: 0 0 15px #00f0ff, 0 0 30px #00f0ff;
+      margin-bottom: 20px;
+    }
+
+    #current-number {
+      font-size: 7em;
+      color: #ffea00;
+      text-shadow: 0 0 20px #ffea00, 0 0 40px #ffea00;
+      margin: 40px 0;
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        transform: scale(1);
+        opacity: 1;
+      }
+      to {
+        transform: scale(1.05);
+        opacity: 0.9;
+      }
+    }
+
+    .btn {
+      background: linear-gradient(145deg, #00f0ff, #0004d4);
+      color: #000;
+      font-size: 1.5em;
+      font-weight: bold;
+      padding: 15px 35px;
+      border: none;
+      border-radius: 12px;
+      margin: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 20px #3700ff;
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px #00f0ff, 0 0 50px #00f0ff;
+    }
+
+    #reiniciar-btn {
+      display: none;
+      background: linear-gradient(145deg, #ff0040, #a10323);
+      color: #fff;
+      box-shadow: 0 0 20px #ff0033;
+    }
+
+    #reiniciar-btn:hover {
+      box-shadow: 0 0 40px #ff0033, 0 0 60px #ff0033;
+    }
+
+    .numeros-sorteados {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 10px;
+      max-width: 800px;
+      margin-top: 40px;
+      width: 100%;
+    }
+
+    .numeros-sorteados span {
+      background-color: #111;
+      border: 2px solid #00f0ff;
+      color: #0ff;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1.4em;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 0 8px #1100ff;
+      transition: all 0.2s ease;
+    }
+
+    .numeros-sorteados span.ultimo {
+      background-color: #ffea00;
+      color: #000;
+      border-color: #ffea00;
+      box-shadow: 0 0 20px #00ff0d, 0 0 40px #ffea00;
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 600px) {
+      #current-number {
+        font-size: 4em;
+      }
+
+      .btn {
+        font-size: 1.2em;
+        padding: 12px 25px;
+      }
+
+      .numeros-sorteados {
+        grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+        gap: 8px;
+      }
+
+      .numeros-sorteados span {
+        font-size: 1em;
+        padding: 8px;
+      }
+
+      .bola-animada {
+  position: fixed;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, #ffea00);
+  color: #000;
+  font-size: 3em;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  box-shadow: 0 0 30px #ffea00;
+  animation: cair 1.5s ease-out forwards;
+}
+
+@keyframes cair {
+  0% {
+    top: -120px;
+    transform: translateX(-50%) rotate(0deg);
+  }
+
+  100% {
+    top: 35%;
+    transform: translateX(-50%) rotate(720deg);
+  }
+}
+    }
+  </style>
+</head>
+<body>
+
+  <h1>BINGO </h1>
+
+  <div id="current-number">🎱</div>
+
+  <button onclick="sortearNumero()" id="sortear-btn" class="btn">🎲 Sortear Número</button>
+  <button onclick="reiniciarBingo()" id="reiniciar-btn" class="btn">🔁 Reiniciar</button>
+
+  <div class="numeros-sorteados" id="numeros-sorteados">
+    <!-- Números sorteados aparecem aqui -->
+  </div>
+
+  <script>
+    let numerosDisponiveis = [];
+    let numerosSorteados = [];
+
+    function iniciarBingo() {
+      numerosDisponiveis = Array.from({ length: 75 }, (_, i) => i + 1);
+      numerosSorteados = [];
+      document.getElementById('current-number').textContent = '🎱';
+      document.getElementById('numeros-sorteados').innerHTML = '';
+      document.getElementById('sortear-btn').style.display = 'inline-block';
+      document.getElementById('reiniciar-btn').style.display = 'none';
+    }
+
+    function sortearNumero() {
+      if (numerosDisponiveis.length === 0) {
+        document.getElementById('current-number').textContent = 'FIM!';
+        document.getElementById('sortear-btn').style.display = 'none';
+        document.getElementById('reiniciar-btn').style.display = 'inline-block';
+        return;
+      }
+
+      const indice = Math.floor(Math.random() * numerosDisponiveis.length);
+      const numero = numerosDisponiveis.splice(indice, 1)[0];
+      numerosSorteados.push(numero);
+
+      document.getElementById('current-number').textContent = numero;
+
+      const span = document.createElement('span');
+      span.textContent = numero;
+      span.classList.add('ultimo');
+
+      // Remove a classe 'ultimo' de todos os anteriores
+      const todos = document.querySelectorAll('.numeros-sorteados span');
+      todos.forEach(s => s.classList.remove('ultimo'));
+
+      document.getElementById('numeros-sorteados').appendChild(span);
+    }
+
+    function reiniciarBingo() {
+      iniciarBingo();
+    }
+
+    iniciarBingo();
+  </script>
+
+</body>
+</html>
